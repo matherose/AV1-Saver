@@ -2,7 +2,7 @@
 
 Are you tired of wasting storage space on outdated video and photo codecs? Welcome to the AV1 Saver project! My mission is to help you save space while preserving the quality of your precious memories.
 
-> ⚠️ **WARNING** ⚠️
+> [!WARNING]
 > (For now, the script only works on Linux and MacOS)
 
 ## Requirements
