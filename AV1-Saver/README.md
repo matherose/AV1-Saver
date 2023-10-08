@@ -3,7 +3,8 @@
 The aim of this project is to save space when storing videos and photos.
 We're no longer in the early 2000s, so we no longer need to store videos in MPEG-2 or MPEG-4, we have better codecs and even better ones are on the way. Today we have AV1, which is royalty-free and open-source, but beyond that it's also much more efficient than MPEG-4. It's so efficient that it can even be used for photos, which is the subject of this project. The idea is to save space when storing photos and videos without compromising their quality.
 
-## (For now, the script only works on Linux and MacOs)
+> [!WARNING] 
+> (For now, the script only works on Linux and MacOs)
 
 ### Requirements
 I wanted to make this project as simple as possible, so I decided to use only :
