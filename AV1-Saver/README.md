@@ -28,3 +28,14 @@ If you don't indicate the input folder, the help will be displayed.
 Error: Input directory is required.
 Usage: ./test.sh -i <input_directory> [-o <output_directory>]
 ```
+
+### Quality
+- For the photos, the script will convert them to AVIF with the **Quality** settings to 80. Since AVIF is a new format more efficient than JPEG, the quality is not the same. But the difference is not noticeable, even with a quality of 80. If you want to change the quality, you can edit the script and change the value of the variable `quality`.
+
+- For the videos, it's the same principle, it will convert them to MKV using AV1 with the settings:
+  - **Bitrate**: 2M (Recommended by FFmpeg)
+  - **CRF**: 35 (Recommended by FFmpeg)
+  - **Audio codec**: Vorbis (Just because it's open-source)
+  - **Audio bitrate**: 320k (320k is as good as CD quality, so it's more than enough for videos)
+
+Those values are the values i found to be the best for me, but you can change them by editing the script if your needs are different.
