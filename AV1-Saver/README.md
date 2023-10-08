@@ -35,7 +35,7 @@ Usage: ./test.sh -i <input_directory> [-o <output_directory>]
 - For the videos, it's the same principle, it will convert them to MKV using AV1 with the settings:
   - **Bitrate**: 2M (Recommended by FFmpeg)
   - **CRF**: 35 (Recommended by FFmpeg)
-  - **Audio codec**: Vorbis (Just because it's open-source)
+  - **Audio codec**: Vorbis (Just because i really like this codec and the team behind)
   - **Audio bitrate**: 320k (320k is as good as CD quality, so it's more than enough for videos)
 
 Those values are the values i found to be the best for me, but you can change them by editing the script if your needs are different.
