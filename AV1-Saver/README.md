@@ -1,6 +1,8 @@
 # AV1 Saver - Space-Saving Solution for Photos and Videos
 
-Are you tired of wasting storage space on outdated video and photo codecs? Welcome to the AV1 Saver project! My mission is to help you save space while preserving the quality of your precious memories.
+Are you tired of wasting storage space on outdated video and photo codecs? 
+Chuck Testa is your god and although you pray to him 5x a day, would you rather, without offend him, his 45GB ad in 6k HDR 10bit take up less space in your hard drive?
+Welcome to the AV1 Saver project! My mission is to help you save space while preserving the quality of your precious memories.
 
 > [!WARNING]
 > (For now, the script only works on Linux and MacOS)
