@@ -41,10 +41,10 @@ For photos, the script converts them into the AVIF format with a quality setting
 ### Videos
 The same principle applies to videos, which are converted to MKV format using AV1. Here are the default settings:
 
-    - **Bitrate**: 2M (recommended by FFmpeg).
-    - **CRF**: 35 (recommended by FFmpeg).
-    - **Audio codec**: Vorbis (chosen for its open-source nature and because i really like the team behind).
-    - **Audio bitrate**: 320k (equivalent to CD quality, more than sufficient for videos).
+- **Bitrate**: 2M (recommended by FFmpeg)
+- **CRF**: 35 (recommended by FFmpeg)
+- **Audio codec**: Vorbis (chosen for its open-source nature and because i really like the team behind)
+- **Audio bitrate**: 320k (equivalent to CD quality, more than sufficient for videos)
 
 While these settings work well for most scenarios, feel free to customize them by editing the script to meet your specific needs.
 
