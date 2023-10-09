@@ -46,4 +46,4 @@ The same principle applies to videos, which are converted to MKV format using AV
 While these settings work well for most scenarios, feel free to customize them by editing the script to meet your specific needs.
 
 With AV1 Saver, you can enjoy high-quality photos and videos while reclaiming valuable storage space. Give it a try and experience the future of media compression today! 🌟
-![oh no! there's chuck in my markdown!](https://imgflip.com/i/81wq77)
+![oh no! there's chuck in my markdown!](https://i.imgflip.com/81wq77.jpg)
