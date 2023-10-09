@@ -27,7 +27,7 @@ If you forget to provide the input folder, the script will display the usage inf
 
 ```bash
 Error: Input directory is required.
-Usage: ./test.sh -i <input_directory> [-o <output_directory>]
+Usage: ./av1-saver.sh -i <input_directory> [-o <output_directory>]
 ```
 
 ## Quality Matters
