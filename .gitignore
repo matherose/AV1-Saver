@@ -1,0 +1,13 @@
+# Ignore system-specific files or directories
+.DS_Store
+Thumbs.db
+
+# Ignore log files and temporary files
+*.log
+*.swp
+*.swo
+*.swn
+*.swm
+
+# Ignore generated output files
+/output/
