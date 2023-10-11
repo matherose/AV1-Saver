@@ -33,7 +33,6 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
 
-
 # Default directories
 inputdir=""
 outputdir="./output"
@@ -121,7 +120,7 @@ convert_video() {
       output_file="$outputdir/$relative_path"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
-      if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" -y "$output_file.mkv" >/dev/null 2>&1; then
+      if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file.mkv" >/dev/null 2>&1; then
         if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file.mkv" >/dev/null 2>&1; then
           rm "$filename"
         else
@@ -192,7 +191,7 @@ else
 fi
 
 # Delete all empty directories in the input directory
-find "$inputdir" -type d -empty -delete >/dev/null 2>&1 
+find "$inputdir" -type d -empty -delete >/dev/null 2>&1
 
 # For MacOS, delete all .DS_Store files in the input directory
 [[ $(uname) == "Darwin" ]] && find "$inputdir" -name ".DS_Store" -delete >/dev/null 2>&1
@@ -208,4 +207,5 @@ echo -e "Output directory size: ${GREEN}$outputsize_human${NC}\n"
 # Print the total size saved
 savingsize_bytes=$((inputsize_bytes - outputsize_bytes))
 savingsize_human=$(human_readable_size $savingsize_bytes)
-echo -e "Total size saved: ${GREEN}$savingsize_human${NC}"
+savingpercentage=$((savingsize_bytes * 100 / inputsize_bytes))
+echo -e "Total size saved: ${GREEN}$savingsize_human${NC} (${YELLOW}$savingpercentage%)${NC}"

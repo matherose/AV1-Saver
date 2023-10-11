@@ -7,14 +7,14 @@ Are you tired of wasting storage space on outdated video and photo codecs?
 Chuck Testa is your god and although you pray to him 5x a day, would you rather, without offend him, his 45GB ad in 6k HDR 10bit Dolby Atmos take up less space in your hard drive?
 Welcome to the AV1 Saver project! My mission is to help you save space while preserving the quality of your precious memories.
 
-> [!NOTE]
-> Add a sign with a promotional price like Steve Balmer for Windows 1.0 in 1986
-
 ## Requirements
 I've designed this project to be as straightforward as possible, relying on just a few essential tools:
 - **FFmpeg** to convert videos
 - **ImageMagick** to convert photos
 - **exiftool** to copy metadata from the original file to the new one
+
+> [!NOTE]
+> I didn't set a preset for ffmpeg because i didn't wanted to limit the script to a specific version of ffmpeg. If you want to use a preset, just add the ***-preset <preset>*** option to the ffmpeg command.
 
 ## Installation
 Installing AV1 Saver is a breeze. Simply download the script and run it from any location. For added convenience, I recommend placing it in your home directory and creating a symlink in your /usr/bin directory, allowing you to execute it from anywhere.
