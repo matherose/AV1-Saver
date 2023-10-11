@@ -19,7 +19,7 @@ print_help() {
 
 # Function to count files in the input directory
 count_files() {
-  total_files=$(find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) | wc -l)
+  total_files=$(find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) | wc -l)
 }
 
 # Function to update progress
@@ -36,60 +36,73 @@ update_progress() {
   echo -ne "]\r"
 }
 
-# Function to convert video files
-convert_video() {
-  count_files
-  find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) | while read filename; do
-    filename_without_extension=$(basename "$filename" | cut -f 1 -d '.')
-    output_subdir=$(dirname "$filename" | sed "s|$inputdir|$outputdir|")
-    mkdir -p "$output_subdir"
-
-    # Use ffmpeg to convert the video format with error handling
-    if ffmpeg -i "$filename" -c:v libsvtav1 -b:v 2M -crf 35 -c:a libvorbis -b:a 320k \
-      "$output_subdir/$filename_without_extension.mkv" >/dev/null 2>&1; then
-      # Copy date-related metadata using exiftool
-      if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_subdir/$filename_without_extension.mkv" >/dev/null 2>&1; then
-        rm "$filename"
-        update_progress
-      fi
-    else
-      echo "Conversion of $filename failed."
-    fi
-  done
-}
-
 # Function to convert photo files
 convert_photo() {
   count_files
-  find "$inputdir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) | while read filename; do
+  find "$inputdir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) -print0 | while IFS= read -r -d '' filename; do
     filename_without_extension=$(basename "$filename" | cut -f 1 -d '.')
-    output_subdir=$(dirname "$filename" | sed "s|$inputdir|$outputdir|")
-    mkdir -p "$output_subdir"
+    relative_path="${filename%/*}"
+    output_subdir="$outputdir/$relative_path"
+    output_file="$output_subdir/$filename_without_extension.avif"
+    mkdir -p "$output_subdir" >/dev/null 2>&1
 
-    # Convert to AVIF format using magick while preserving metadata with error handling
-    if magick "$filename" -quality 80% "$output_subdir/$filename_without_extension.avif"; then
+    # Use magick to convert the photo format with -y option for overwriting
+    if magick "$filename" -quality 80% "$output_file" >/dev/null 2>&1; then
       # Copy date-related metadata using exiftool
-      if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_subdir/$filename_without_extension.avif" >/dev/null 2>&1; then
+      if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
         rm "$filename"
-        update_progress
+      else
+        echo "Error: Failed to copy metadata for $filename" >/dev/null
       fi
     else
-      echo "Conversion of $filename failed."
+      echo "Conversion of $filename failed." >/dev/null
     fi
+
+    update_progress
+  done
+}
+
+# Function to convert video files
+convert_video() {
+  count_files
+  find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) -print0 | while IFS= read -r -d '' filename; do
+    filename_without_extension=$(basename "$filename" | cut -f 1 -d '.')
+    relative_path="${filename%/*}"
+    output_subdir="$outputdir/$relative_path"
+    output_file="$output_subdir/$filename_without_extension.mkv"
+    mkdir -p "$output_subdir" >/dev/null 2>&1
+
+    # Use ffmpeg to convert the video format with -y option for overwriting
+    if ffmpeg -nostdin -i "$filename" -c:v libsvtav1 -b:v 2M -crf 35 -c:a libvorbis -b:a 320k -y "$output_file" >/dev/null 2>&1; then
+      # Copy date-related metadata using exiftool
+      if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
+        rm "$filename"
+      else
+        echo "Error: Failed to copy metadata for $filename" >/dev/null
+      fi
+    else
+      echo "Conversion of $filename failed." >/dev/null
+    fi
+
+    update_progress
   done
 }
 
 # Parse command-line arguments
 while getopts ":i:o:" opt; do
   case "$opt" in
-    i) inputdir="$OPTARG";;
-    o) outputdir="$OPTARG";;
-    \?) echo "Invalid option: -$OPTARG" >&2
-      print_help
-      exit 1;;
-    :)  echo "Option -$OPTARG requires an argument." >&2
-      print_help
-      exit 1;;
+  i) inputdir="$OPTARG" ;;
+  o) outputdir="$OPTARG" ;;
+  \?)
+    echo "Invalid option: -$OPTARG" >&2
+    print_help
+    exit 1
+    ;;
+  :)
+    echo "Option -$OPTARG requires an argument." >&2
+    print_help
+    exit 1
+    ;;
   esac
 done
 
@@ -101,10 +114,9 @@ if [ -z "$inputdir" ]; then
 fi
 
 # Create the output directory if it doesn't exist
-[ -d "$outputdir" ] || mkdir -p "$outputdir"
+[ -d "$outputdir" ] || mkdir -p "$outputdir" >/dev/null 2>&1
 
 # Run the conversion functions
 convert_video
-convert_photo
 
 echo -e "\nConversion completed!"
