@@ -19,7 +19,7 @@ check_command() {
 }
 
 # Check required commands
-for cmd in find ffmpeg exiftool "$magick"; do
+for cmd in find ffmpeg exiftool jhead avifenc "$magick"; do
   check_command "$cmd"
 done
 
@@ -76,7 +76,7 @@ update_progress() {
   echo -n "]"
 }
 
-# Function to convert photo files
+# Function to convert photo files using avifenc and jhead for metadata
 convert_photo() {
   count_files
 
@@ -89,8 +89,13 @@ convert_photo() {
       output_file="$outputdir/$file_no_extension.avif"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
-      if $magick "$filename" -quality "$quality" -format avif "$output_file" >/dev/null 2>&1; then
-        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
+      avifenc "$filename" "$output_file" -c best
+      if [ $? -eq 0 ]; then
+        # Use jhead to copy the metadata from the original file to the AVIF file
+        jhead -te "$filename" "$output_file"
+
+        # Remove the original file if metadata copying is successful
+        if [ $? -eq 0 ]; then
           rm "$filename"
         else
           echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null
