@@ -85,9 +85,8 @@ convert_photo() {
   find "$inputdir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
-      file_basename=$(basename "$relative_path")
-      file_no_extension="${file_basename%.*}"  # Remove the original extension
-      output_file="$outputdir/$file_no_extension.avif"
+      file_no_extension=$(basename "$filename" | sed 's/\(.*\)\..*/\1/')  # Remove the original extension
+      output_file="$outputdir/$relative_path.avif"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
       if $magick "$filename" -quality "$quality" "$output_file" >/dev/null 2>&1; then
@@ -116,9 +115,8 @@ convert_video() {
   find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
-      file_basename=$(basename "$relative_path")
-      file_no_extension="${file_basename%.*}"  # Remove the original extension
-      output_file="$outputdir/$file_no_extension.mkv"
+      file_no_extension=$(basename "$filename" | sed 's/\(.*\)\..*/\1/')  # Remove the original extension
+      output_file="$outputdir/$relative_path.mkv"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
       if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file" >/dev/null 2>&1; then
