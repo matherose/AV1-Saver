@@ -49,7 +49,14 @@ audio_bitrate="320k"
 human_readable_size() {
   export LC_NUMERIC=C
   local size_in_bytes=$1
-  numfmt --to=iec -i --suffix=B --format="%.2f" "$size_in_bytes"
+  numfmt --to=iec \
+    --format="%.2f" \
+    --suffix=B \
+    --padding=7 \
+    --round=nearest \
+    --from-unit=1024 \
+    --to-unit=1024 \
+    "$size_in_bytes"
 }
 
 # Function to print usage help
