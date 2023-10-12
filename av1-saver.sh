@@ -6,12 +6,8 @@ if [[ $(uname) != "Linux" && $(uname) != "Darwin" ]]; then
   exit 1
 fi
 
-# Determine the image conversion tool (magick for Linux, convert for macOS)
-if uname -a | grep -i linux >/dev/null 2>&1; then
-  magick="magick"
-else
-  magick="convert"
-fi
+# Find if ImageMagick is magick or convert
+magick=$(command -v magick || command -v convert)
 
 # Function to check if a command is available
 check_command() {
