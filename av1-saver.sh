@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Check if the OS is Linux or macOS
-if [[ $(uname) != "Linux" && $(uname) != "Darwin" ]]; then
-  echo "Error: This script only supports Linux and macOS."
-  exit 1
-fi
+[[ $(uname) != "Linux" && $(uname) != "Darwin" ]] && { echo "Error: This script only supports Linux and macOS."; exit 1; }
 
 # Find if ImageMagick is magick or convert
 magick=$(command -v magick || command -v convert)
@@ -12,10 +9,7 @@ magick=$(command -v magick || command -v convert)
 # Function to check if a command is available
 check_command() {
   local cmd="$1"
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    echo "Error: $cmd is not installed."
-    exit 1
-  fi
+  ! command -v "$cmd" >/dev/null 2>&1 && { echo "Error: $cmd is not installed."; exit 1; }
 }
 
 # Check required commands
@@ -67,107 +61,58 @@ update_progress() {
   converted_files=$((converted_files + 1))
   progress=$((converted_files * 100 / total_files))
   echo -ne "\rProgress: $converted_files/$total_files ($progress%) ["
-  for ((i = 0; i < progress; i++)); do
-    echo -n "#"
-  done
-  for ((i = progress; i < 100; i++)); do
-    echo -n " "
-  done
+  for ((i = 0; i < progress; i++)); do echo -n "#"; done
+  for ((i = progress; i < 100; i++)); do echo -n " "; done
   echo -n "]"
 }
 
 # Function to convert photo files
 convert_photo() {
   count_files
-
   mkdir -p "$outputdir"
-
   find "$inputdir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
       file_no_extension="${relative_path%.*}"  # Remove the original extension
       output_file="$outputdir/$file_no_extension.avif"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
-
-      if $magick "$filename" -quality "$quality" -format avif "$output_file" >/dev/null 2>&1; then
-        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
-          rm "$filename"
-        else
-          echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null
-        fi
-      else
-        echo -e "${RED}Error${NC}: Conversion of $filename failed." >/dev/null
-      fi
+      $magick "$filename" -quality "$quality" -format avif "$output_file" >/dev/null 2>&1 && { exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1 || echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null; } || echo -e "${RED}Error${NC}: Conversion of $filename failed." >/dev/null
     fi
-
     update_progress
   done
-
   echo ""
 }
 
 # Function to convert video files
 convert_video() {
   count_files
-
   mkdir -p "$outputdir"
-
   find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
       file_no_extension="${relative_path%.*}"  # Remove the original extension
       output_file="$outputdir/$file_no_extension.mkv"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
-
-      if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file" >/dev/null 2>&1; then
-        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
-          rm "$filename"
-        else
-          echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null
-        fi
-      else
-        echo -e "${RED}Error${NC}: Conversion of $filename failed." >/dev/null
-      fi
+      ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file" >/dev/null 2>&1 && { exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1 || echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null; } || echo -e "${RED}Error${NC}: Conversion of $filename failed." >/dev/null
     fi
-
     update_progress
   done
-
   echo ""
 }
 
 # Parse arguments
 while getopts "i:o:h" opt; do
   case $opt in
-  i)
-    inputdir="$OPTARG"
-    ;;
-  o)
-    outputdir="$OPTARG"
-    ;;
-  h)
-    print_help
-    exit 0
-    ;;
-  \?)
-    echo -e "${RED}Error${NC}: Invalid option -$OPTARG" >&2
-    print_help
-    exit 1
-    ;;
-  :)
-    echo -e "${RED}Error${NC}: Option -$OPTARG requires an argument." >&2
-    print_help
-    exit 1
-    ;;
+  i) inputdir="$OPTARG";;
+  o) outputdir="$OPTARG";;
+  h) print_help; exit 0;;
+  \?) echo -e "${RED}Error${NC}: Invalid option -$OPTARG" >&2; print_help; exit 1;;
+  :) echo -e "${RED}Error${NC}: Option -$OPTARG requires an argument." >&2; print_help; exit 1;;
   esac
 done
 
 # Check if input directory is empty
-if [[ -z "$inputdir" ]]; then
-  echo -e "${RED}Error${NC}: Input directory is empty." >&2
-  print_help
-  exit 1
-fi
+[[ -z "$inputdir" ]] && { echo -e "${RED}Error${NC}: Input directory is empty." >&2; print_help; exit 1; }
 
 # Create output directory if it doesn't exist
 mkdir -p "$outputdir" >/dev/null 2>&1
