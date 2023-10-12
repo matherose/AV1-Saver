@@ -85,11 +85,13 @@ convert_photo() {
   find "$inputdir" -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.webp" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
-      output_file="$outputdir/$relative_path"
+      file_basename=$(basename "$relative_path")
+      file_no_extension="${file_basename%.*}"  # Remove the original extension
+      output_file="$outputdir/$file_no_extension.avif"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
-      if $magick "$filename" -quality "$quality" "$output_file.avif" >/dev/null 2>&1; then
-        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file.avif" >/dev/null 2>&1; then
+      if $magick "$filename" -quality "$quality" "$output_file" >/dev/null 2>&1; then
+        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
           rm "$filename"
         else
           echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null
@@ -114,11 +116,13 @@ convert_video() {
   find "$inputdir" -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.avi" -o -name "*.mov" -o -name "*.flv" -o -name "*.wmv" -o -name "*.webm" \) | while IFS= read -r filename; do
     if [[ -f "$filename" ]]; then
       relative_path="${filename#$inputdir/}"
-      output_file="$outputdir/$relative_path"
+      file_basename=$(basename "$relative_path")
+      file_no_extension="${file_basename%.*}"  # Remove the original extension
+      output_file="$outputdir/$file_no_extension.mkv"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
-      if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file.mkv" >/dev/null 2>&1; then
-        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file.mkv" >/dev/null 2>&1; then
+      if ffmpeg -nostdin -i "$filename" -c:v "$video_codec" -b:v "$video_bitrate" -crf "$video_crf" -c:a "$audio_codec" -b:a "$audio_bitrate" "$output_file" >/dev/null 2>&1; then
+        if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
           rm "$filename"
         else
           echo -e "${RED}Error${NC}: Failed to copy metadata for $filename" >/dev/null
