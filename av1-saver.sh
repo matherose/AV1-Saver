@@ -89,7 +89,7 @@ convert_photo() {
       output_file="$outputdir/$file_no_extension.avif"
       mkdir -p "$(dirname "$output_file")" >/dev/null 2>&1
 
-      if $magick "$filename" -quality "$quality" "$output_file" >/dev/null 2>&1; then
+      if $magick "$filename" -quality "$quality" -format avif "$output_file" >/dev/null 2>&1; then
         if exiftool -TagsFromFile "$filename" -CreateDate -ModifyDate -FileModifyDate -overwrite_original "$output_file" >/dev/null 2>&1; then
           rm "$filename"
         else
