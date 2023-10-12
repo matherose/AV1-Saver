@@ -47,8 +47,9 @@ audio_bitrate="320k"
 
 # Function to convert size in bytes to a human-readable format with adaptive units
 human_readable_size() {
+  export LC_NUMERIC=C
   local size_in_bytes=$1
-  numfmt --to=iec --suffix=B --format="%.2f" "$size_in_bytes" 2>/dev/null || echo "$size_in_bytes B"
+  numfmt --to=iec --suffix=B --format="%.2f" "$size_in_bytes"
 }
 
 # Function to print usage help
