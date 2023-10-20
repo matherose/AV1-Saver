@@ -1,53 +1,78 @@
-# AV1 Saver - Space-Saving Solution for Photos and Videos
+# AV1 Saver
+_"You clicked, we shrank. Your solution to swollen media files!"_
 
-> [!WARNING]
-> (For now, the script only works on Linux and MacOS)
+Hey folks! You ever look at the space your media files take up and think, "Gee, I wish I had room for more cat videos?" Well, fur-tunately, we have just the right toolbox for you! So buckle up, grab a snack, and let's dive right into the magic that AV1 Saver has up its sleeves. But don't fret, we promise to explain it as if you're five (or maybe a particularly smart cat)!
 
-Are you tired of wasting storage space on outdated video and photo codecs? 
-Chuck Testa is your god and although you pray to him 5x a day, would you rather, without offend him, his 45GB ad in 6k HDR 10bit Dolby Atmos take up less space in your hard drive?
-Welcome to the AV1 Saver project! My mission is to help you save space while preserving the quality of your precious memories.
+## What's AV1 Saver?
 
-## Requirements
-I've designed this project to be as straightforward as possible, relying on just a few essential tools:
-- **FFmpeg** to convert videos
-- **ImageMagick** to convert photos
-- **exiftool** to copy metadata from the original file to the new one
+Think of AV1 Saver as a magical shrink ray. You blast it at your oversized media files and _voila!_ they become smaller - much smaller - but without losing any detail or quality. So it's magic but without any tricky side-effects.
 
 > [!NOTE]
-> I didn't set a preset for ffmpeg because i didn't wanted to limit the script to a specific version of ffmpeg. If you want to use a preset, just add the ***-preset <preset>*** option to the ffmpeg command.
+>Just like the spell, 'reducio,' in Harry Potter, but for your files. No wand needed!
 
-## Installation
-Installing AV1 Saver is a breeze. Simply download the script and run it from any location. For added convenience, I recommend placing it in your home directory and creating a symlink in your /usr/bin directory, allowing you to execute it from anywhere.
+## How Does it Work?
+
+We take your big, scary media files and use a clever codec called **AV1** to squash them down into friendly, smaller sizes. It's like taking a big, fluffy marshmallow and squashing it down into a cute little cube that still tastes just as sweet. That's exactly what AV1 Saver does - but with videos and images, not marshmallows.
+
+## Requirements and Expectations
+
+### Tools Needed
+
+In order for the magic to happen, you need two tools:
+1. **ffmpeg**: This is what compresses your videos and makes them smaller.
+2. **avifenc**: And this guy does the same thing, but for pictures.
+3. **exiftool (optional)**: If you have this, we can also move all the important info from your old picture to your new, smaller one.
+
+They're all free to download and use, so get them installed and running before using AV1 Saver. 
+
+### Speed and Size
+
+AV1 Saver is pretty efficient, but the actual speed will really depend on your computer. The good news is that you'll definitely end up with smaller video and photo files, no matter how long it takes. 
+
+> [!WARNING]
+>Remember, great things come to those who wait. So be patient!
 
 ## Usage
-To put AV1 Saver to work, specify the input folder (ideal for batch processing). You can also specify the output folder; otherwise, the script will create an output folder in the current directory.
 
-```bash
-./av1-saver.sh -i /path/to/input/folder -o /path/to/output/folder
-```
+It's as simple as ABC! Here's how:
+1. Download AV1 Saver (it's free!).
+2. Open up your favorite terminal (Command Prompt, Terminal, etc.).
+3. Run the script using the command: `-i 'path/to/your/media/files'`.  
+    
+    For a custom output folder, use the `-o` argument like so: `-i 'path/to/your/media/files' -o 'path/to/save/your/smaller/files'`.  
+    
+    See, told you it was easy!
 
-If you forget to provide the input folder, the script will display the usage information:
+## For the Technical Wizards
 
-```bash
-Error: Input directory is required.
-Usage: ./av1-saver.sh -i <input_directory> [-o <output_directory>]
-```
+If you are well-versed in the mysteries of bash scripting and video compression, you might want to know more about nitty-gritty of the AV1 Saver's working. So let's pull back the curtain and dive deep down the rabbit hole.
 
-## Quality Matters
+AV1 Saver is a bash script that leverages the encoding capabilities of **ffmpeg** with AV1 by AOMedia. As we all know, AV1 is an open and royalty-free video coding format, which is designed for the transmission of video over the internet. And, AV1 achieves a high data compression ratio, producing videos of a smaller size without compromising on the quality.
 
-### Photos
-For photos, the script converts them into the AVIF format with a quality setting of 80. AVIF is a cutting-edge format more efficient than JPEG, and even at a quality of 80, the difference is hardly noticeable. If you wish to adjust the quality, simply edit the script and modify the ***quality*** variable.
+The script also uses Energy-Efficient Multicore-Aware Parallel AV1 Encoder (`av1an`) for images. It's a multiplatform AVIF converter that helps with parallelizing and speeding up AVIF conversion. 
 
-### Videos
-The same principle applies to videos, which are converted to MKV format using AV1. Here are the default settings:
+Here is an overview of the bash script:
 
-- **Bitrate**: 2M (recommended by FFmpeg)
-- **CRF**: 35 (recommended by FFmpeg)
-- **Audio codec**: Vorbis (chosen for its open-source nature and because i really like the team behind)
-- **Audio bitrate**: 320k (equivalent to CD quality, more than sufficient for videos)
+1. **Input validation** - The script checks if both Linux or macOS and the required commands (ffmpeg and avifenc) are available.
 
-While these settings work well for most scenarios, feel free to customize them by editing the script to meet your specific needs.
+2. **Directory size calculation** - Calculated using `du` command.
 
-With AV1 Saver, you can enjoy high-quality photos and videos while reclaiming valuable storage space. Give it a try and experience the future of media compression today! 🌟
+3. **File conversion** - Media files are iteratively converted to either MKV or AVIF format using ffmpeg or avifenc respectively.
 
-![oh no! there's a chuck in my markdown!](https://i.imgflip.com/81xmk8.jpg)
+4. **Progress Update** - An interactive progress update is shown to visualize the conversion progress.
+
+5. **Output calculation** - Finally, the script summarizes the conversion by showing the total file size saved (input size - output size)
+
+Here are the technical details of the compression settings in the script:
+- Video: Video is compressed to `libsvtav1` codec, with a video bitrate of `2M`, crf is set to `35`, preset is set to `8`, which enabled slower encoding but better compression ratio.
+- Image: Images are converted using AVIF compression with a quality of `80`.
+
+It's also worth noting that the EXIF metadata from the original images is preserved during the conversion using `exiftool`.
+
+As an expert, you might be interested in tweaking these numbers to suit your specific use-cases! The script is quite flexible that way. 
+
+Happy tinkering!
+
+## Ready to Get Started?
+
+That's really all there is to it. So why wait? Give AV1 Saver a try and start making more room for more cat videos right now!
