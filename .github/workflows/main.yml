@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} triggered ${{ github.workflow }} on ${{ github.eve
 on: [push, pull_request]
 jobs:
     prepare:
-        name: Prepare
+        name: Update
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
@@ -18,35 +18,58 @@ jobs:
                       sudo apt-get update
                       sudo apt-get install ffmpeg imagemagick libimage-exiftool-perl libavifenc
                   fi
+        steps:
             - name: Checkout
               uses: actions/checkout@v2
-            - name: Download sample image
-              run: |
-                    mkdir -p images
-                    wget -P images https://picsum.photos/3840/2160
-            - name: Download sample video
-              run: |
-                    mkdir -p videos
-                    wget -P videos https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4
-            - name: Convert image to AVIF
-              run: |
-                    chmod +x av1.sh
-                    ./av1.sh -i images
-            - name: Convert video to AVIF
-              run: |
-                    chmod +x av1.sh
-                    ./av1.sh -i videos
-            - name: Check if the files are created
-              run: |
-                    ls -l output/images
-                    ls -l output/videos
-            - name: Create Release
-              id: create_release
-              uses: actions/create-release@v1
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                  tag_name: ${{ github.ref }}
-                  release_name: Release ${{ github.ref }}
-                  draft: false
-                  prerelease: false
+    download_sample:
+        name: Download sample
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+        depends_on: [prepare]
+        steps:
+          - name: Download sample image
+            run: |
+                mkdir -p images
+                wget -P images https://picsum.photos/3840/2160
+          - name: Download sample video
+            run: |
+                mkdir -p videos
+                wget -P videos https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4
+    convert:
+        name: Convert
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+        depends_on: [download_sample]
+        steps:
+          - name: Convert image
+            run: |
+               chmod +x av1.sh
+                ./av1.sh -i images
+          - name: Convert video
+            run: |
+                chmod +x av1.sh
+                ./av1.sh -i videos
+    Release:
+        name: Release
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+        depends_on: [convert]
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v2
+          - name: Create release
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+                tag_name: ${{ github.sha }}
+                release_name: ${{ github.sha }}
+                draft: false
+                prerelease: false
