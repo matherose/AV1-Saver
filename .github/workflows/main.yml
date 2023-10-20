@@ -22,7 +22,7 @@ jobs:
           brew install ffmpeg imagemagick exiftool libavif
         elif [ ${{ runner.os }} == 'Linux' ]; then
           sudo apt-get update
-          sudo apt-get install -y ffmpeg imagemagick libimage-exiftool-perl
+          sudo apt-get install -y coreutils ffmpeg imagemagick libimage-exiftool-perl
           # Install libavif on Ubuntu (you might need to add a PPA or other method for this)
         fi
 
@@ -42,7 +42,8 @@ jobs:
 
     - name: Run av1.sh Script
       run: |
-        ./av1.sh -i images -o videos
+        ./av1.sh -i images
+        ./av1.sh -i videos
 
     - name: Create Release
       id: create_release
