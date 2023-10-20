@@ -51,7 +51,8 @@ If you are well-versed in the mysteries of bash scripting and video compression,
 
 AV1 Saver is a bash script that leverages the encoding capabilities of **ffmpeg** with AV1 by AOMedia. As we all know, AV1 is an open and royalty-free video coding format, which is designed for the transmission of video over the internet. And, AV1 achieves a high data compression ratio, producing videos of a smaller size without compromising on the quality.
 
-The script also uses Energy-Efficient Multicore-Aware Parallel AV1 Encoder (`av1an`) for images. It's a multiplatform AVIF converter that helps with parallelizing and speeding up AVIF conversion. 
+> [!NOTE]
+> I'm looking into integrating av1an to parallelize conversions.
 
 Here is an overview of the bash script:
 
