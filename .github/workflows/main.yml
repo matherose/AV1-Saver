@@ -44,15 +44,15 @@ jobs:
       run: |
         ./av1.sh -i images
         ./av1.sh -i videos
-
-    - name: Create Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          images/*
-          videos/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        tag_name: ${{ github.sha }}
-        release_name: ${{ github.sha }}
+  
+  create_release:
+    needs: av1_conversion  # Depend on the av1_conversion job
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: pipe-cd/actions-gh-release@v2.3.4
+        with:
+          release_file: '**/RELEASE'
+          token: ${{ secrets.GITHUB_TOKEN }}
