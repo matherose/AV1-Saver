@@ -17,12 +17,14 @@ jobs:
                       brew install ffmpeg
                       brew install imagemagick
                       brew install exiftool
+                      brew install avifenc
                   else
                       sudo apt-get update
                       sudo apt-get upgrade
                       sudo apt-get install ffmpeg
                       sudo apt-get install imagemagick
                       sudo apt-get install libimage-exiftool-perl
+                      sudo apt-get install libavifenc
                   fi
             - name: Checkout
               uses: actions/checkout@v2
