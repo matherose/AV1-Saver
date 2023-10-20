@@ -13,7 +13,7 @@ jobs:
               run: |
                   if [ "${{ matrix.os }}" = "macos-latest" ]; then
                       brew update
-                      brew install ffmpeg imagemagick exiftool avifenc
+                      brew install ffmpeg imagemagick exiftool libavif
                   else
                       sudo apt-get update
                       sudo apt-get install ffmpeg imagemagick libimage-exiftool-perl libavif-bin
