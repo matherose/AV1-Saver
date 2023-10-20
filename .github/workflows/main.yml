@@ -39,7 +39,7 @@ jobs:
                     chmod +x av1.sh
                     ./av1.sh -i images
             - name: Convert video to AVIF
-               run: |
+              run: |
                     chmod +x av1.sh
                     ./av1.sh -i videos
             - name: Check if the files are created
