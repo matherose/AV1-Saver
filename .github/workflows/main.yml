@@ -1,74 +1,55 @@
-name: CI (Mac and Linux)
-run-name: ${{ github.actor }} triggered ${{ github.workflow }} on ${{ github.event_name }}
-on: [push, pull_request]
+name: AV1 Conversion Workflow
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-    prepare:
-        name: Update
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest]
-        steps:
-            - name: Update system
-              run: |
-                  if [ "${{ matrix.os }}" = "macos-latest" ]; then
-                      brew update
-                      brew install ffmpeg imagemagick exiftool libavif
-                  else
-                      sudo apt-get update
-                      sudo apt-get install ffmpeg imagemagick libimage-exiftool-perl libavif-bin
-                  fi
-            - name: Checkout
-              uses: actions/checkout@v2
-    download_sample:
-        name: Download sample
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest]
-        needs: [prepare]
-        steps:
-          - name: Download sample image
-            run: |
-                mkdir -p images
-                wget -P images https://picsum.photos/3840/2160
-          - name: Download sample video
-            run: |
-                mkdir -p videos
-                wget -P videos https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4
-    convert:
-        name: Convert
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest]
-        needs: [download_sample]
-        steps:
-          - name: Convert image
-            run: |
-               chmod +x av1.sh
-                ./av1.sh -i images
-          - name: Convert video
-            run: |
-                chmod +x av1.sh
-                ./av1.sh -i videos
-    Release:
-        name: Release
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                os: [macos-latest, ubuntu-latest]
-        needs: [convert]
-        steps:
-          - name: Checkout
-            uses: actions/checkout@v2
-          - name: Create release
-            id: create_release
-            uses: actions/create-release@v1
-            env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            with:
-                tag_name: ${{ github.sha }}
-                release_name: ${{ github.sha }}
-                draft: false
-                prerelease: false
+  av1_conversion:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up FFmpeg, ImageMagick, ExifTool, and libavif
+      run: |
+        if [ ${{ runner.os }} == 'macOS' ]; then
+          brew install ffmpeg imagemagick exiftool libavif
+        elif [ ${{ runner.os }} == 'Linux' ]; then
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg imagemagick libimage-exiftool-perl
+          # Install libavif on Ubuntu (you might need to add a PPA or other method for this)
+        fi
+
+    - name: Create Folders
+      run: |
+        mkdir images
+        mkdir videos
+
+    - name: Download Images and Videos
+      run: |
+        curl -o images/image.jpg https://picsum.photos/3840/2160
+        curl -o videos/video.mp4 https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4
+
+    - name: Make av1.sh Executable
+      run: |
+        chmod +x av1.sh
+
+    - name: Run av1.sh Script
+      run: |
+        ./av1.sh -i images -o videos
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          images/*
+          videos/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
