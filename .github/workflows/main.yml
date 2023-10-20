@@ -54,3 +54,5 @@ jobs:
           videos/*
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ github.sha }}
+        release_name: ${{ github.sha }}
