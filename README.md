@@ -31,6 +31,7 @@ AV1 Saver is pretty efficient, but the actual speed will really depend on your c
 
 > [!WARNING]
 >Remember, great things come to those who wait. So be patient!
+>I'm thinking about adding hwaccel when i get my ARC GPU, if i want to compress all my OnlyFans videos, i would like to do it in a reasonable time.
 
 ## Usage
 
