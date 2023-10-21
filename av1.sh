@@ -22,7 +22,8 @@ ffmpeg_silence="-hide_banner -loglevel panic"
 avienc_speed="8"
 avienc_threads="all"
 avienc_yuv="420"
-avifenc_quality="80"
+avifenc_quality_min="0"
+avifenc_quality_max="63"
 
 # colors
 red="\033[0;31m"   # Error
@@ -129,7 +130,7 @@ convert_media() {
         if [[ "$mime" == "video/"* ]]; then
             ffmpeg -i "$file" -c:v $ffmpeg_video_codec -b:v $ffmpeg_video_bitrate -crf $ffmpeg_video_crf -preset $ffmpeg_video_preset -pix_fmt $ffmpeg_video_yuv -g $ffmpeg_video_grain -noise_reduction $ffmpeg_video_grain_denoise -c:a $ffmpeg_audio_codec -b:a $ffmpeg_audio_bitrate $ffmpeg_silence "$output_filename_path" >/dev/null 2>&1
         elif [[ "$mime" == "image/"* ]]; then
-            avifenc -s $avienc_speed -j $avienc_threads -y $avienc_yuv -q $avifenc_quality -o "$output_filename_path" "$file" >/dev/null 2>&1
+            avifenc -s $avienc_speed -j $avienc_threads -y $avienc_yuv --min $avifenc_quality_min --max $avifenc_quality_max -o "$output_filename_path" "$file" >/dev/null 2>&1
 
             # Transfer EXIF data from the original file to the converted file using exiftool
             exiftool -overwrite_original -TagsFromFile "$file" "$output_filename_path" >/dev/null 2>&1
