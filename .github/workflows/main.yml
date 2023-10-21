@@ -44,6 +44,10 @@ jobs:
       run: |
         ./av1.sh -i images
         ./av1.sh -i videos
+    - name: Check if files exist
+      run: |
+        ls -l output/images/*.avif
+        ls -l output/videos/*.mkv
   
   create_release:
     needs: av1_conversion  # Depend on the av1_conversion job
