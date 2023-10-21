@@ -42,8 +42,8 @@ jobs:
 
     - name: Run av1.sh Script
       run: |
-        ./av1.sh -i images
-        ./av1.sh -i videos
+        bash -x ./av1.sh -i images
+        bash -x ./av1.sh -i videos
     - name: Check if files exist
       run: |
         ls -l output/images/*.avif
