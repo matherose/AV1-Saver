@@ -140,7 +140,6 @@ convert_media() {
     done
 }
 
-
 #################### MAIN ####################
 
 # Check if arguments are provided
