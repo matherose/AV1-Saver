@@ -6,7 +6,36 @@ on:
       - main
 
 jobs:
+  compile_ffmpeg:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libvpx-dev libopus-dev libass-dev
+
+    - name: Download FFmpeg sources
+      run: |
+        git clone https://github.com/FFmpeg/FFmpeg.git
+        cd FFmpeg
+        git checkout release/4.4 # You can specify a different release or branch
+
+    - name: Build FFmpeg
+      run: |
+        cd FFmpeg
+        ./configure --enable-gpl --enable-libx264 --enable-libvpx --enable-libopus --enable-libass
+        make -j$(nproc)
+        sudo make install
+
+    - name: Verify FFmpeg installation
+      run: |
+        ffmpeg -version
+
   av1_conversion:
+    needs: compile_ffmpeg
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -22,7 +51,7 @@ jobs:
           brew install ffmpeg imagemagick exiftool libavif
         elif [ ${{ runner.os }} == 'Linux' ]; then
           sudo apt-get update
-          sudo apt-get install -y coreutils ffmpeg imagemagick libimage-exiftool-perl libavif-bin
+          sudo apt-get install -y coreutils libimage-exiftool-perl libavif-bin
           # Install libavif on Ubuntu (you might need to add a PPA or other method for this)
         fi
 
@@ -44,19 +73,26 @@ jobs:
       run: |
         bash -x ./av1.sh -i images
         bash -x ./av1.sh -i videos
+
     - name: Check if files exist
       run: |
         ls -l output/images/*.avif
         ls -l output/videos/*.mkv
-  
+
   create_release:
-    needs: av1_conversion  # Depend on the av1_conversion job
+    needs: av1_conversion
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: pipe-cd/actions-gh-release@v2.3.4
-        with:
-          release_file: '**/RELEASE'
-          token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v2
+
+    - name: Create a GitHub Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          output/images/*.avif
+          output/videos/*.mkv
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# You should add any required secrets like GITHUB_TOKEN in your repository settings.
