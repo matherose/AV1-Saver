@@ -46,18 +46,38 @@ jobs:
         ls -l output/images/*.avif
         ls -l output/videos/*.mkv
 
-  create_release:
-    needs: av1_conversion
+  release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Create a GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          output/images/*.avif
-          output/videos/*.mkv
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up Git
+        run: |
+          git config user.email "your-email@example.com"
+          git config user.name "Your Name"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create Git Tag
+        run: |
+          MAJOR=0
+          MINOR=1
+          PATCH=4
+          git tag v$MAJOR.$MINOR.$PATCH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Push Git Tag
+        run: |
+          git push origin v$MAJOR.$MINOR.$PATCH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: # specify the files you want to attach to the release
+          tag: v$MAJOR.$MINOR.$PATCH
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
