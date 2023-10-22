@@ -15,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libvpx-dev libopus-dev libass-dev
+        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libopus-dev libavif
 
     - name: Download FFmpeg sources
       run: |
@@ -26,7 +26,7 @@ jobs:
     - name: Build FFmpeg
       run: |
         cd FFmpeg
-        ./configure --enable-gpl --enable-libx264 --enable-libvpx --enable-libopus --enable-libass
+        ./configure --enable-gpl --enable-libx264 --enable-libopus --enable-libavif
         make -j$(nproc)
         sudo make install
 
@@ -45,13 +45,13 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Set up FFmpeg, ImageMagick, ExifTool, and libavif
+    - name: Set up FFmpeg
       run: |
         if [ ${{ runner.os }} == 'macOS' ]; then
-          brew install ffmpeg imagemagick exiftool libavif
+          brew install ffmpeg libavif
         elif [ ${{ runner.os }} == 'Linux' ]; then
           sudo apt-get update
-          sudo apt-get install -y coreutils libimage-exiftool-perl libavif-bin
+          sudo apt-get install -y ffmpeg libavif-bin
           # Install libavif on Ubuntu (you might need to add a PPA or other method for this)
         fi
 
@@ -69,15 +69,13 @@ jobs:
       run: |
         chmod +x av1.sh
 
-    - name: Run av1.sh Script
+    - name: Run av1.sh Script for Images
       run: |
         bash -x ./av1.sh -i images
-        bash -x ./av1.sh -i videos
 
-    - name: Check if files exist
+    - name: Run av1.sh Script for Videos
       run: |
-        ls -l output/images/*.avif
-        ls -l output/videos/*.mkv
+        bash -x ./av1.sh -i videos
 
   create_release:
     needs: av1_conversion
@@ -94,5 +92,3 @@ jobs:
           output/videos/*.mkv
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-# You should add any required secrets like GITHUB_TOKEN in your repository settings.
