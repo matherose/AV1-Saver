@@ -30,7 +30,7 @@ jobs:
     - name: Download Images and Videos
       run: |
         wget https://picsum.photos/1366/768/\?random -O images/image.jpg
-        wget https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_50mb.mp4 -O videos/video.mp4
+        wget https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4 -O videos/video.mp4
 
     - name: Make av1.sh Executable
       run: |
