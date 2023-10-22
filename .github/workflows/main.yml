@@ -9,52 +9,52 @@ on:
       - main
 
 jobs:
-  av1_conversion:
+  prepare:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
-
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            name: Ubuntu 20.04
+          - os: macos-latest
+            name: macOS 10.15
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Install dependencies
+        run: |
+          [ "$RUNNER_OS" = "Linux" ] && sudo apt-get update && sudo apt-get install -y ffmpeg* imagemagick* exiftool* libavif*
+          [ "$RUNNER_OS" = "macOS" ] && brew update && brew install ffmpeg imagemagick exiftool libavif
 
-    - name: Set up FFmpeg, ImageMagick, ExifTool, and libavif
-      run: |
-        if [ ${{ runner.os }} == 'macOS' ]; then
-          brew install ffmpeg imagemagick exiftool libavif
-        fi
+      - name: Create folders
+        run: |
+          mkdir images
+          mkdir videos
 
-    - name: Create Folders
-      run: |
-        mkdir images
-        mkdir videos
+      - name: Download samples
+        run: |
+          wget https://picsum.photos/1366/768/\?random -O images/image.jpg
+          wget https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4 -O videos/video.mp4
 
-    - name: Download Images and Videos
-      run: |
-        wget https://picsum.photos/1366/768/\?random -O images/image.jpg
-        wget https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4 -O videos/video.mp4
+      - name: Make av1.sh executable
+        run: |
+          chmod +x av1.sh
 
-    - name: Make av1.sh Executable
-      run: |
-        chmod +x av1.sh
+      - name: Run av1.sh
+        run: |
+          bash -x av1.sh -i images
+          bash -x av1.sh -i videos
 
-    - name: Run av1.sh Script
-      run: |
-        bash -x ./av1.sh -i images
-        bash -x ./av1.sh -i videos
+      - name: Check files
+        run: |
+          ls -l output/images/*.avif
+          ls -l output/videos/*.mkv
 
-    - name: Check if files exist
-      run: |
-        ls -l output/images/*.avif
-        ls -l output/videos/*.mkv
-
-  release-on-push:
-    needs: av1_conversion
-    runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: rymndhng/release-on-push-action@master
+      - name: Upload artifacts and create release
+        uses: actions/upload-artifact@v2
         with:
-          bump_version_scheme: minor
+          name: av1
+          path: output
+          
