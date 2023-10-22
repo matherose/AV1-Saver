@@ -128,7 +128,7 @@ convert_media() {
         fi
 
         if [[ "$mime" == "video/"* ]]; then
-            ffmpeg -i "$file" -c:v $ffmpeg_video_codec -b:v $ffmpeg_video_bitrate -crf $ffmpeg_video_crf -preset $ffmpeg_video_preset -pix_fmt $ffmpeg_video_yuv -g $ffmpeg_video_grain -noise_reduction $ffmpeg_video_grain_denoise -c:a $ffmpeg_audio_codec -b:a $ffmpeg_audio_bitrate $ffmpeg_silence "$output_filename_path" >/dev/null 2>&1
+            ffmpeg -i "$file" -c:v $ffmpeg_video_codec -b:v $ffmpeg_video_bitrate -crf $ffmpeg_video_crf -preset $ffmpeg_video_preset -pix_fmt $ffmpeg_video_yuv -g $ffmpeg_video_grain -noise_reduction $ffmpeg_video_grain_denoise -c:a $ffmpeg_audio_codec -b:a $ffmpeg_audio_bitrate $ffmpeg_silence "$output_filename_path"
         elif [[ "$mime" == "image/"* ]]; then
             avifenc -s $avienc_speed -j $avienc_threads -y $avienc_yuv --min $avifenc_quality_min --max $avifenc_quality_max -o "$output_filename_path" "$file" >/dev/null 2>&1
 
