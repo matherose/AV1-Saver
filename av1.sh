@@ -16,7 +16,7 @@ ffmpeg_video_grain="25"
 ffmpeg_video_grain_denoise="0"
 ffmpeg_audio_codec="libopus"
 ffmpeg_audio_bitrate="192k"
-ffmpeg_silence="-hide_banner -loglevel panic"
+ffmpeg_silence="-hide_banner -loglevel info"
 
 # image
 avienc_speed="8"
