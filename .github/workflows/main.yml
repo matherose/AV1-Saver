@@ -49,6 +49,11 @@ jobs:
           ls -l output/images/*.avif
           ls -l output/videos/*.mkv
 
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
   Create_Release:
     needs: CI
     runs-on: ubuntu-latest
