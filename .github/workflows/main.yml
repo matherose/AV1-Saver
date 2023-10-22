@@ -6,33 +6,16 @@ on:
       - main
 
 jobs:
-  compile_libavif:
+  compile_ffmpeg:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install build dependencies for libavif
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake nasm meson ninja-build
-
-    - name: Clone and build libavif from source
-      run: |
-        git clone https://github.com/AOMediaCodec/libavif.git
-        cd libavif
-        meson build
-        ninja -C build
-        sudo ninja -C build install
-
-  compile_ffmpeg:
-    needs: compile_libavif
-    runs-on: ubuntu-latest
-    steps:
-    - name: Install FFmpeg build dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libopus-dev
+        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libvpx-dev libopus-dev libass-dev
 
     - name: Download FFmpeg sources
       run: |
@@ -43,7 +26,7 @@ jobs:
     - name: Build FFmpeg
       run: |
         cd FFmpeg
-        ./configure --enable-gpl --enable-libx264 --enable-libopus
+        ./configure --enable-gpl --enable-libx264 --enable-libvpx --enable-libopus --enable-libass
         make -j$(nproc)
         sudo make install
 
@@ -62,13 +45,14 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Set up FFmpeg
+    - name: Set up FFmpeg, ImageMagick, ExifTool, and libavif
       run: |
         if [ ${{ runner.os }} == 'macOS' ]; then
-          brew install ffmpeg
+          brew install ffmpeg imagemagick exiftool libavif
         elif [ ${{ runner.os }} == 'Linux' ]; then
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y coreutils libimage-exiftool-perl libavif-bin
+          # Install libavif on Ubuntu (you might need to add a PPA or other method for this)
         fi
 
     - name: Create Folders
@@ -85,13 +69,15 @@ jobs:
       run: |
         chmod +x av1.sh
 
-    - name: Run av1.sh Script for Images
+    - name: Run av1.sh Script
       run: |
         bash -x ./av1.sh -i images
-
-    - name: Run av1.sh Script for Videos
-      run: |
         bash -x ./av1.sh -i videos
+
+    - name: Check if files exist
+      run: |
+        ls -l output/images/*.avif
+        ls -l output/videos/*.mkv
 
   create_release:
     needs: av1_conversion
@@ -108,3 +94,5 @@ jobs:
           output/videos/*.mkv
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# You should add any required secrets like GITHUB_TOKEN in your repository settings.
