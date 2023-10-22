@@ -13,10 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest]
         include:
-          - os: ubuntu-latest
-            name: Ubuntu 20.04
           - os: macos-latest
             name: macOS 10.15
     steps:
@@ -57,4 +55,3 @@ jobs:
         with:
           name: av1
           path: output
-          
