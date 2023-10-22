@@ -7,9 +7,11 @@ on:
   pull_request:
     branches:
       - main
+    tags:
+      - 'v*'
 
 jobs:
-  prepare:
+  CI:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -50,8 +52,18 @@ jobs:
           ls -l output/images/*.avif
           ls -l output/videos/*.mkv
 
-      - name: Upload artifacts and create release
-        uses: actions/upload-artifact@v2
-        with:
-          name: av1
-          path: output
+      - name: Create Release
+        needs: prepare
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v2
+          - name: Create Release
+            id: create_release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              tag_name: ${{ github.ref }}
+              release_name: Release ${{ github.ref }}
+              draft: false
+              prerelease: false
