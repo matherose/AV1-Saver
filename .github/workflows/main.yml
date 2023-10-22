@@ -49,5 +49,12 @@ jobs:
         ls -l output/images/*.avif
         ls -l output/videos/*.mkv
 
-    - name: Tag/Release on Push Action
-      uses: rymndhng/release-on-push-action@v0.27.0
+  release-on-push:
+    needs: av1_conversion
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: minor
