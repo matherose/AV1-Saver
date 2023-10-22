@@ -15,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libx264-dev libvpx-dev libopus-dev libass-dev
+        sudo apt-get install -y build-essential yasm pkg-config libtool autoconf automake cmake zlib1g-dev libfreetype6-dev libopus-dev libass-dev
 
     - name: Download FFmpeg sources
       run: |
@@ -26,7 +26,7 @@ jobs:
     - name: Build FFmpeg
       run: |
         cd FFmpeg
-        ./configure --enable-gpl --enable-libx264 --enable-libvpx --enable-libopus --enable-libass
+        ./configure --enable-gpl --enable-libsvtav1 --enable-libopus
         make -j$(nproc)
         sudo make install
 
@@ -94,5 +94,3 @@ jobs:
           output/videos/*.mkv
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-# You should add any required secrets like GITHUB_TOKEN in your repository settings.
