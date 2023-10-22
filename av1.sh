@@ -119,7 +119,7 @@ convert_media() {
             continue
         fi
 
-        output_filename_path="$output_dir/$input_dir/$relative_path/$output_filename"  # Adjust output path
+        output_filename_path="$output_dir/$(basename $input_dir)/$(basename $relative_path)/$output_filename"  # Adjust output path
 
         if [ -f "$output_filename_path" ]; then
             echo -e "${green}Skipping $filename (Already Converted)${reset}"  # Removed original extension
