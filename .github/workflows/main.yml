@@ -49,30 +49,5 @@ jobs:
         ls -l output/images/*.avif
         ls -l output/videos/*.mkv
 
-# Create a release based on the current tag
-  release:
-    needs: av1_conversion
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest]
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install Dependencies
-      run: |
-        npm install -g @semantic-release/changelog @semantic-release/exec @semantic-release/git @semantic-release/github
-        npm install
-
-    - name: Run Semantic Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        npx semantic-release
+    - name: Tag/Release on Push Action
+      uses: rymndhng/release-on-push-action@v0.27.0
