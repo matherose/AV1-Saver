@@ -172,6 +172,10 @@ while getopts ":i:o:" opt; do
     esac
 done
 
+# Remove trailing slashes from input_dir and output_dir
+input_dir=${input_dir%/}
+output_dir=${output_dir%/}
+
 mkdir -p "$output_dir" >/dev/null 2>&1
 
 # Calculate input directory size
