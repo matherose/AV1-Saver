@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           [ "$RUNNER_OS" = "Linux" ] && sudo apt-get update && sudo apt-get install -y ffmpeg* imagemagick* exiftool* libavif*
-          [ "$RUNNER_OS" = "macOS" ] && brew update && brew install ffmpeg imagemagick exiftool libavif
+          [ "$RUNNER_OS" = "macOS" ] && brew install ffmpeg imagemagick exiftool libavif
 
       - name: Create folders
         run: |
